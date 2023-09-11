@@ -15,7 +15,7 @@ import {
   message,
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   addTaskAction,
   clearTaskAction,
@@ -29,20 +29,37 @@ const normFile = (e) => {
   }
   return e?.fileList;
 };
-
+const getLocalItems = () => {
+  let list = localStorage.getItem("lists");
+  console.log(list);
+  if (list) {
+    return JSON.parse(localStorage.getItem("lists"));
+  } else {
+    return [];
+  }
+};
 function App() {
-  const counter = useSelector((state) => state.tasks); // lấy data
-  const dispatch = useDispatch(); // đẩy data vào redux
+  // const counter = useSelector((state) => state.tasks); // lấy data
+  // const dispatch = useDispatch(); // đẩy data vào redux
 
   const [task, setTask] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [listState, setListState] = useState([]);
+  const [listState, setListState] = useState(getLocalItems());
 
   const [selectTask, setSelectTask] = useState(null);
+  
+  // add data to localStorage 
+  useEffect( () => {
+     localStorage.setItem('lists',JSON.stringify(listState));
+  }, [listState]);
 
-  const [list, setList] = useState([]);
+  // get data from localStorage 
+  
+    
+
+  // const [list, setList] = useState([]);
   // useEffect(() => {
   //   if (counter.length > 0) {
   //     localStorage.setItem("toDoList", JSON.stringify(counter));
@@ -50,19 +67,19 @@ function App() {
   //   }
   //   console.log("Counter", counter);
   // }, [counter]);
-  useEffect(() => {
-    const storedList = JSON.parse(localStorage.getItem("toDoList"));
-    setList(storedList || []);
-    dispatch(addTaskAction(storedList));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const storedList = JSON.parse(localStorage.getItem("toDoList"));
+  //   setList(storedList || []);
+  //   dispatch(addTaskAction(storedList));
+  // }, [dispatch]);
 
-  useEffect(() => {
-    if (counter.length > 0) {
-      localStorage.setItem("toDoList", JSON.stringify(counter));
-      setListState(counter);
-      console.log("true");
-    }
-  }, [counter]);
+  //  useEffect(() => {
+  //    if (counter.length > 0) {
+  //      localStorage.setItem("toDoList", JSON.stringify(counter));
+  //      setListState(counter);
+  //      console.log("true");
+  //    }
+  //  }, [counter]);
   const handleSubmit = (values) => {
     if (selectTask) {
       const updateState = {
@@ -73,7 +90,7 @@ function App() {
         status: values.status,
       };
       setListState([{ ...updateState }]); // update
-      dispatch(editTaskAction(updateState));
+      //dispatch(editTaskAction(updateState));
     } else {
       const newState = {
         id: listState.length,
@@ -84,7 +101,8 @@ function App() {
         status: values.status,
       };
       setListState([...listState, newState]); // nối
-      dispatch(addTaskAction(newState));
+      console.log(values);
+      // dispatch(addTaskAction(newState));
     }
     form2.resetFields();
 
@@ -114,7 +132,7 @@ function App() {
       newItems.splice(indexToRemove, 1); // hàm splice để xóa ptu bắt đầu từ index( id)
       return newItems;
     });
-    dispatch(clearTaskAction(indexToRemove));
+    // dispatch(clearTaskAction(indexToRemove));
     // console.log(indexToRemove);
   };
   const confirm = (id) => {
@@ -166,53 +184,56 @@ function App() {
           </Form>
         </div>
         <div className="card">
-          {list?.map((value, index) => (
-            <Card
-              className={
-                new Date() > value.time[1] && value.status !== "Finish"
-                  ? "alerting" // ten className
-                  : null
-              }
-              key={index}
-              title={value.name}
-              bordered={false}
-              style={{
-                width: 300,
-              }}
-              actions={[
-                <div className="edit" onClick={() => handleEdit(value)}>
-                  <EditOutlined key="edit" />
-                </div>,
-                <div className="delete">
-                  <Popconfirm
-                    title="Delete the task"
-                    description="Are you sure to delete this task?"
-                    // onConfirm={() => {
-                    //   removeTask(index); message.success("Delete successfully")
-                    // }}
-                    onConfirm={() => confirm(index)}
-                    onCancel={cancel}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <DeleteOutlined key="delete" />
-                  </Popconfirm>
-                </div>,
-              ]}
-            >
-              <div className="content">
-                <p>Piority: {value.piority}</p>
-                <p>Number participants: {value.number}</p>
-                {/* <p>{value.time}</p> */}
-                {/* <p>Start time : {value.time[0].format("DD-MM-YYYY")}</p>
-                <p>End time : {value.time[1].format("DD-MM-YYYY")}</p> */}
-                {new Date() > value.time[1] && value.status !== "Finish" ? (
-                  <p className="overdue">Overdue</p>
-                ) : null}
-                <p>Status: {value.status}</p>
-              </div>
-            </Card>
-          ))}
+          {listState.map((value, index) => {
+            console.log(value.time);
+            return (
+              <Card
+                className={
+                  new Date() > value.time[1] && value.status !== "Finish"
+                    ? "alerting" // ten className
+                    : null
+                }
+                key={index}
+                title={value.name}
+                bordered={false}
+                style={{
+                  width: 300,
+                }}
+                actions={[
+                  <div className="edit" onClick={() => handleEdit(value)}>
+                    <EditOutlined key="edit" />
+                  </div>,
+                  <div className="delete">
+                    <Popconfirm
+                      title="Delete the task"
+                      description="Are you sure to delete this task?"
+                      // onConfirm={() => {
+                      //   removeTask(index); message.success("Delete successfully")
+                      // }}
+                      onConfirm={() => confirm(index)}
+                      onCancel={cancel}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <DeleteOutlined key="delete" />
+                    </Popconfirm>
+                  </div>,
+                ]}
+              >
+                <div className="content">
+                  <p>Piority: {value.piority}</p>
+                  <p>Number participants: {value.number}</p>
+                  {/* <p>{value.time}</p> 
+                  <p>Start time : {value.time[0].month()}</p>
+                  <p>End time : {value.time[1].format("DD-MM-YYYY")}</p> 
+                  {new Date() > value.time[1] && value.status !== "Finish" ? (
+                    <p className="overdue">Overdue</p>
+                  ) : null} */ } 
+                  <p>Status: {value.status}</p>
+                </div>
+              </Card>
+            );
+          })}
         </div>
         <div className="parent-info">
           <Modal
