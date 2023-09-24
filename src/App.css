@@ -1,69 +1,68 @@
 .parent {
+    background-image: url("/public/pic_1.png");
+    padding: 40px 100px;
+    min-height: 100vh;
 }
-.background {
-  /* background-image: url("./pic_1.png"); */
-  /* background-repeat: no-repeat; */
-  background-color: #20aaff8c;
-  background-size: cover;
-  /* background-position: top; */
-  height: 100vh;
-}
+
 .text-main {
-  text-align: center;
-  padding-top: 35px;
-  margin-top: 0;
-  font-size: 60px;
-  color: #72336e;
-  font-family: "Lilita One", cursive;
+    text-align: center;
+    font-size: 60px;
+    color: #72336e;
+    margin-bottom: 20px;
+    font-family: "Lilita One", cursive;
 }
 .parent-search {
-  text-align: center;
-  & div input {
+    text-align: center;
+}
+
+.parent-search input {
     width: 300px;
     height: 50px;
-  }
-  & div button {
-    width: 80px;
-    height: 50px;
-  }
 }
+
+.parent-search button {
+    font-weight: bold;
+    width: 100%;
+    height: 50px;
+}
+
 .info-detail {
-  margin: auto;
-  margin-top: 30px;
+    margin: auto;
+    margin-top: 30px;
 }
 .form {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.form button {
+    text-transform: uppercase;
 }
 .card {
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-  row-gap: 20px;
-  column-gap: 10px;
-  width: 1240px;
-  margin: auto;
-  text-align: center;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    text-align: center;
 }
 .content {
-  text-align: left;
+    text-align: left;
 }
 .edit {
-  font-size: 20px;
-  color: gray;
+    font-size: 20px;
+    color: gray;
 }
 .delete {
-  font-size: 20px;
-  color: red;
+    font-size: 20px;
+    color: red;
 }
-.alerting {
-  background-color: white;
-}
+
 .overdue {
-  position: absolute;
-  rotate: -49deg;
-  color: orange;
-  top: -1px;
-  font-size: 18px;
-  font-weight: 600;
-  left: -6px;
+    position: absolute;
+    rotate: -49deg;
+    color: orange;
+    top: -1px;
+    font-size: 18px;
+    font-weight: 600;
+    left: -6px;
 }
