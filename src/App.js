@@ -11,16 +11,17 @@ import {
   Popconfirm,
   Radio,
   Select,
+  Tag,
   Upload,
   message,
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { useSelector } from "react-redux";
 import {
   addTaskAction,
   clearTaskAction,
   editTaskAction,
 } from "./redux/taskReducer/taskAction";
+import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const normFile = (e) => {
@@ -33,15 +34,22 @@ const getLocalItems = () => {
   let list = localStorage.getItem("lists");
   console.log(list);
   if (list) {
-    return JSON.parse(localStorage.getItem("lists"));
+    console.log();
+    return JSON.parse(list).map((item) => {
+      const {
+        time: [from, to],  // khởi tạo biến time gồm 2 value: from, to 
+        ...other  //  nhóm các phần tử còn lại 
+      } = item;  
+      return {
+        ...other,  // destructring mảng other ra thành các ptu riêng 
+        time: [dayjs(from), dayjs(to)], // ép kiểu cho biến time sang dayjs()
+      };
+    });                           
   } else {
     return [];
   }
 };
 function App() {
-  // const counter = useSelector((state) => state.tasks); // lấy data
-  // const dispatch = useDispatch(); // đẩy data vào redux
-
   const [task, setTask] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,37 +57,11 @@ function App() {
   const [listState, setListState] = useState(getLocalItems());
 
   const [selectTask, setSelectTask] = useState(null);
-  
-  // add data to localStorage 
-  useEffect( () => {
-     localStorage.setItem('lists',JSON.stringify(listState));
+
+  useEffect(() => {
+    localStorage.setItem("lists", JSON.stringify(listState)); // add data to localStorage
   }, [listState]);
 
-  // get data from localStorage 
-  
-    
-
-  // const [list, setList] = useState([]);
-  // useEffect(() => {
-  //   if (counter.length > 0) {
-  //     localStorage.setItem("toDoList", JSON.stringify(counter));
-  //     console.log("true");
-  //   }
-  //   console.log("Counter", counter);
-  // }, [counter]);
-  // useEffect(() => {
-  //   const storedList = JSON.parse(localStorage.getItem("toDoList"));
-  //   setList(storedList || []);
-  //   dispatch(addTaskAction(storedList));
-  // }, [dispatch]);
-
-  //  useEffect(() => {
-  //    if (counter.length > 0) {
-  //      localStorage.setItem("toDoList", JSON.stringify(counter));
-  //      setListState(counter);
-  //      console.log("true");
-  //    }
-  //  }, [counter]);
   const handleSubmit = (values) => {
     if (selectTask) {
       const updateState = {
@@ -90,7 +72,6 @@ function App() {
         status: values.status,
       };
       setListState([{ ...updateState }]); // update
-      //dispatch(editTaskAction(updateState));
     } else {
       const newState = {
         id: listState.length,
@@ -102,10 +83,8 @@ function App() {
       };
       setListState([...listState, newState]); // nối
       console.log(values);
-      // dispatch(addTaskAction(newState));
     }
     form2.resetFields();
-
     setIsModalOpen(false);
   };
   const showModal = (value) => {
@@ -116,14 +95,12 @@ function App() {
   // const handleOk = () => {
   //   // setIsModalOpen(true);
   //   localStorage.removeItem("toDoList");
-  // };
-  // console.log(listState, "test");
+  // }
   const handleCancel = () => {
     setIsModalOpen(false);
     setSelectTask(null);
     form2.resetFields();
   };
-  // console.log("testst", selectTask);
   const removeTask = (indexToRemove) => {
     // indexToRemove => id
     setListState((prevItems) => {
@@ -132,8 +109,6 @@ function App() {
       newItems.splice(indexToRemove, 1); // hàm splice để xóa ptu bắt đầu từ index( id)
       return newItems;
     });
-    // dispatch(clearTaskAction(indexToRemove));
-    // console.log(indexToRemove);
   };
   const confirm = (id) => {
     removeTask(id);
@@ -156,7 +131,6 @@ function App() {
       status: values.status,
     };
     form2.setFieldsValue(initialValues);
-    // console.log(values);
   };
   return (
     <div className="parent">
@@ -170,14 +144,10 @@ function App() {
                 { required: true, message: "Please input your name task" },
               ]}
             >
-              <Input
-                placeholder="Enter your new task"
-                // value={task}
-                // onChange={(e) => e.target.value}
-              />
+              <Input placeholder="Enter your new task" />
             </Form.Item>
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" className="button-add">
                 Add task
               </Button>
             </Form.Item>
@@ -207,9 +177,6 @@ function App() {
                     <Popconfirm
                       title="Delete the task"
                       description="Are you sure to delete this task?"
-                      // onConfirm={() => {
-                      //   removeTask(index); message.success("Delete successfully")
-                      // }}
                       onConfirm={() => confirm(index)}
                       onCancel={cancel}
                       okText="Yes"
@@ -223,12 +190,12 @@ function App() {
                 <div className="content">
                   <p>Piority: {value.piority}</p>
                   <p>Number participants: {value.number}</p>
-                  {/* <p>{value.time}</p> 
-                  <p>Start time : {value.time[0].month()}</p>
-                  <p>End time : {value.time[1].format("DD-MM-YYYY")}</p> 
+                  {/* <p>{value.time}</p> */}
+                  <p>Start time : {value.time[0].format("DD-MM-YYYY")}</p>
+                  <p>End time : {value.time[1].format("DD-MM-YYYY")}</p>
                   {new Date() > value.time[1] && value.status !== "Finish" ? (
                     <p className="overdue">Overdue</p>
-                  ) : null} */ } 
+                  ) : null}
                   <p>Status: {value.status}</p>
                 </div>
               </Card>
@@ -290,9 +257,15 @@ function App() {
               </Form.Item>
               <Form.Item name="status" label="Status">
                 <Radio.Group>
-                  <Radio value="Not done"> Not done </Radio>
-                  <Radio value="In progress"> In progress </Radio>
-                  <Radio value="Finish"> Finish </Radio>
+                  <Radio value="Not done">
+                    <Tag color="red">Not done</Tag>
+                  </Radio>
+                  <Radio value="In progress">
+                    <Tag color="blue">In progress</Tag>
+                  </Radio>
+                  <Radio value="Finish">
+                    <Tag color="green">Finish </Tag>
+                  </Radio>
                 </Radio.Group>
               </Form.Item>
               <Form.Item>

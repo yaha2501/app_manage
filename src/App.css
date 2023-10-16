@@ -1,19 +1,16 @@
 .parent {
 }
 .background {
-  /* background-image: url("./pic_1.png"); */
-  /* background-repeat: no-repeat; */
-  background-color: #20aaff8c;
+  background: linear-gradient(to bottom, #6600ff 0%, #ff66cc 100%);
   background-size: cover;
-  /* background-position: top; */
-  height: 100vh;
+  height: auto;
 }
 .text-main {
   text-align: center;
   padding-top: 35px;
   margin-top: 0;
   font-size: 60px;
-  color: #72336e;
+  color: #ffa375;
   font-family: "Lilita One", cursive;
 }
 .parent-search {
@@ -66,4 +63,11 @@
   font-size: 18px;
   font-weight: 600;
   left: -6px;
+}
+.button-add {
+  margin-left: 10px; 
+  background-color: #f27474;
+}
+.button-add:hover {
+  background-color: orange !important; 
 }
