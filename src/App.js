@@ -59,8 +59,6 @@ function App() {
 
   const [id, setId] = useState(0);
 
-  const [displayedMonths, setDisplayedMonths] = useState([]);
-
   const [selectTask, setSelectTask] = useState(null);
 
   useEffect(() => {
@@ -138,6 +136,9 @@ function App() {
     };
     form2.setFieldsValue(initialValues);
   };
+  const Months = [
+    ...new Set(listState.map((val) => val.time[0].format("MM"))), //lưu các tháng có trong mảng item
+  ];
   return (
     <div className="parent">
       <div className="background">
@@ -159,99 +160,89 @@ function App() {
             </Form.Item>
           </Form>
         </div>
-        {listState.map((val, index) => {
-          const month = val.time[0].format("MM");
-          if (!displayedMonths.includes(month)) {
-            displayedMonths.push(month)
-            return (
-              <>
-                <h1>Tháng {month}</h1>
-                <div className="card">
-                  {listState
-                    .filter(
-                      (value) =>
-                        value.time[0].format("MM") === val.time[0].format("MM")
-                    )
-                    .map((value, index) => {
-                      return (
-                        <>
-                          <Card
-                            className={
-                              new Date() > value.time[1] &&
-                              value.status !== "Finish"
-                                ? "alerting" // ten className
-                                : null
-                            }
-                            key={index}
-                            title={value.name}
-                            bordered={false}
-                            style={{
-                              width: 300,
-                            }}
-                            actions={[
-                              <div
-                                className="edit"
-                                onClick={() => {
-                                  handleEdit(value);
-                                  setId(index);
-                                }}
+        {Months.sort((a, b) => dayjs(a, "MM") - dayjs(b, "MM")).map((month) => { // sắp xếp tháng
+          return (
+            <>
+              <h1>Tháng {month}</h1>
+              <div className="card">
+                {listState
+                  .filter((value) => value.time[0].format("MM") === month)
+                  .sort((a, b) => a.time[0] - b.time[0]) //sắp xếp các item theo tháng bắt đầu từ bé đến lớn
+                  .map((value, index) => {
+                    return (
+                      <>
+                        <Card
+                          className={
+                            new Date() > value.time[1] &&
+                            value.status !== "Finish"
+                              ? "alerting" // ten className
+                              : null
+                          }
+                          key={index}
+                          title={value.name}
+                          bordered={false}
+                          style={{
+                            width: 300,
+                          }}
+                          actions={[
+                            <div
+                              className="edit"
+                              onClick={() => {
+                                handleEdit(value);
+                                setId(index);
+                              }}
+                            >
+                              <EditOutlined key="edit" />
+                            </div>,
+                            <div className="delete">
+                              <Popconfirm
+                                title="Delete the task"
+                                description="Are you sure to delete this task?"
+                                onConfirm={() => confirm(index)}
+                                onCancel={cancel}
+                                okText="Yes"
+                                cancelText="No"
                               >
-                                <EditOutlined key="edit" />
-                              </div>,
-                              <div className="delete">
-                                <Popconfirm
-                                  title="Delete the task"
-                                  description="Are you sure to delete this task?"
-                                  onConfirm={() => confirm(index)}
-                                  onCancel={cancel}
-                                  okText="Yes"
-                                  cancelText="No"
-                                >
-                                  <DeleteOutlined key="delete" />
-                                </Popconfirm>
-                              </div>,
-                            ]}
-                          >
-                            <div className="content">
-                              <p>Piority: {value.piority}</p>
-                              {/* <p>Number participants: {value.number}</p> */}
-                              {/* <p>{value.time}</p> */}
-                              <p>
-                                Start time :{" "}
-                                {value.time[0].format("DD-MM-YYYY")}
-                              </p>
-                              <p>
-                                End time : {value.time[1].format("DD-MM-YYYY")}
-                              </p>
-                              {new Date() > value.time[1] &&
-                              value.status !== "Finish" ? (
-                                <p className="overdue">Overdue</p>
-                              ) : null}
-                              <p>
-                                Status:{" "}
-                                {value.status === "Finish" ? (
-                                  <HourglassTwoTone spin />
-                                ) : value.status === "Not done" ? (
-                                  <ExclamationCircleTwoTone
-                                    twoToneColor={"#dc143c"}
-                                  />
-                                ) : (
-                                  <CheckCircleTwoTone
-                                    twoToneColor={"#52c41a"}
-                                  />
-                                )}{" "}
-                                {value.status}
-                              </p>
-                            </div>
-                          </Card>
-                        </>
-                      );
-                    })}
-                </div>
-              </>
-            );
-          }
-          return null;
+                                <DeleteOutlined key="delete" />
+                              </Popconfirm>
+                            </div>,
+                          ]}
+                        >
+                          <div className="content">
+                            <p>Piority: {value.piority}</p>
+                            {/* <p>Number participants: {value.number}</p> */}
+                            {/* <p>{value.time}</p> */}
+                            <p>
+                              Start time : {value.time[0].format("DD-MM-YYYY")}
+                            </p>
+                            <p>
+                              End time : {value.time[1].format("DD-MM-YYYY")}
+                            </p>
+                            {new Date() > value.time[1] &&
+                            value.status !== "Finish" ? (
+                              <p className="overdue">Overdue</p>
+                            ) : null}
+                            <p>
+                              Status:{" "}
+                              {value.status === "Finish" ? (
+                                <CheckCircleTwoTone twoToneColor={"#52c41a"} />
+                              ) : value.status === "Not done" ? (
+                                <ExclamationCircleTwoTone
+                                  twoToneColor={"#dc143c"}
+                                />
+                              ) : (
+                                <HourglassTwoTone spin />
+                              )}{" "}
+                              {value.status}
+                            </p>
+                          </div>
+                        </Card>
+                      </>
+                    );
+                  })}
+              </div>
+            </>
+          );
         })}
         <div className="parent-info">
           <Modal
