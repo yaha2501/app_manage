@@ -3,7 +3,8 @@
 .background {
   background: linear-gradient(to bottom, #6600ff 0%, #ff66cc 100%);
   background-size: cover;
-  height: auto;
+  min-height: 100vh;
+
 }
 .text-main {
   text-align: center;
@@ -40,6 +41,7 @@
   width: 1240px;
   margin: auto;
   text-align: center;
+  padding: 20px;
 }
 .content {
   text-align: left;
@@ -65,9 +67,9 @@
   left: -6px;
 }
 .button-add {
-  margin-left: 10px; 
+  margin-left: 10px;
   background-color: #f27474;
 }
 .button-add:hover {
-  background-color: orange !important; 
+  background-color: orange !important;
 }

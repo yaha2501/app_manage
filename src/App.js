@@ -15,12 +15,15 @@ import {
   Upload,
   message,
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import {
-  addTaskAction,
-  clearTaskAction,
-  editTaskAction,
-} from "./redux/taskReducer/taskAction";
+  CheckCircleTwoTone,
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleTwoTone,
+  HourglassTwoTone,
+  PlusOutlined,
+} from "@ant-design/icons";
+
 import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
@@ -32,19 +35,17 @@ const normFile = (e) => {
 };
 const getLocalItems = () => {
   let list = localStorage.getItem("lists");
-  console.log(list);
   if (list) {
-    console.log();
     return JSON.parse(list).map((item) => {
       const {
-        time: [from, to],  // khởi tạo biến time gồm 2 value: from, to 
-        ...other  //  nhóm các phần tử còn lại 
-      } = item;  
+        time: [from, to], // khởi tạo biến time gồm 2 value: from, to
+        ...other //  nhóm các phần tử còn lại
+      } = item;
       return {
-        ...other,  // destructring mảng other ra thành các ptu riêng 
+        ...other, // destructring mảng other ra thành các ptu riêng
         time: [dayjs(from), dayjs(to)], // ép kiểu cho biến time sang dayjs()
       };
-    });                           
+    });
   } else {
     return [];
   }
@@ -55,6 +56,10 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [listState, setListState] = useState(getLocalItems());
+
+  const [id, setId] = useState(0);
+
+  const [displayedMonths, setDisplayedMonths] = useState([]);
 
   const [selectTask, setSelectTask] = useState(null);
 
@@ -71,7 +76,9 @@ function App() {
         time: values.time,
         status: values.status,
       };
-      setListState([{ ...updateState }]); // update
+      const newListState = [...listState];
+      newListState[id] = updateState;
+      setListState(newListState);
     } else {
       const newState = {
         id: listState.length,
@@ -82,7 +89,6 @@ function App() {
         status: values.status,
       };
       setListState([...listState, newState]); // nối
-      console.log(values);
     }
     form2.resetFields();
     setIsModalOpen(false);
@@ -153,55 +159,100 @@ function App() {
             </Form.Item>
           </Form>
         </div>
-        <div className="card">
-          {listState.map((value, index) => {
-            console.log(value.time);
+        {listState.map((val, index) => {
+          const month = val.time[0].format("MM");
+          if (!displayedMonths.includes(month)) {
+            displayedMonths.push(month)
             return (
-              <Card
-                className={
-                  new Date() > value.time[1] && value.status !== "Finish"
-                    ? "alerting" // ten className
-                    : null
-                }
-                key={index}
-                title={value.name}
-                bordered={false}
-                style={{
-                  width: 300,
-                }}
-                actions={[
-                  <div className="edit" onClick={() => handleEdit(value)}>
-                    <EditOutlined key="edit" />
-                  </div>,
-                  <div className="delete">
-                    <Popconfirm
-                      title="Delete the task"
-                      description="Are you sure to delete this task?"
-                      onConfirm={() => confirm(index)}
-                      onCancel={cancel}
-                      okText="Yes"
-                      cancelText="No"
-                    >
-                      <DeleteOutlined key="delete" />
-                    </Popconfirm>
-                  </div>,
-                ]}
-              >
-                <div className="content">
-                  <p>Piority: {value.piority}</p>
-                  <p>Number participants: {value.number}</p>
-                  {/* <p>{value.time}</p> */}
-                  <p>Start time : {value.time[0].format("DD-MM-YYYY")}</p>
-                  <p>End time : {value.time[1].format("DD-MM-YYYY")}</p>
-                  {new Date() > value.time[1] && value.status !== "Finish" ? (
-                    <p className="overdue">Overdue</p>
-                  ) : null}
-                  <p>Status: {value.status}</p>
+              <>
+                <h1>Tháng {month}</h1>
+                <div className="card">
+                  {listState
+                    .filter(
+                      (value) =>
+                        value.time[0].format("MM") === val.time[0].format("MM")
+                    )
+                    .map((value, index) => {
+                      return (
+                        <>
+                          <Card
+                            className={
+                              new Date() > value.time[1] &&
+                              value.status !== "Finish"
+                                ? "alerting" // ten className
+                                : null
+                            }
+                            key={index}
+                            title={value.name}
+                            bordered={false}
+                            style={{
+                              width: 300,
+                            }}
+                            actions={[
+                              <div
+                                className="edit"
+                                onClick={() => {
+                                  handleEdit(value);
+                                  setId(index);
+                                }}
+                              >
+                                <EditOutlined key="edit" />
+                              </div>,
+                              <div className="delete">
+                                <Popconfirm
+                                  title="Delete the task"
+                                  description="Are you sure to delete this task?"
+                                  onConfirm={() => confirm(index)}
+                                  onCancel={cancel}
+                                  okText="Yes"
+                                  cancelText="No"
+                                >
+                                  <DeleteOutlined key="delete" />
+                                </Popconfirm>
+                              </div>,
+                            ]}
+                          >
+                            <div className="content">
+                              <p>Piority: {value.piority}</p>
+                              {/* <p>Number participants: {value.number}</p> */}
+                              {/* <p>{value.time}</p> */}
+                              <p>
+                                Start time :{" "}
+                                {value.time[0].format("DD-MM-YYYY")}
+                              </p>
+                              <p>
+                                End time : {value.time[1].format("DD-MM-YYYY")}
+                              </p>
+                              {new Date() > value.time[1] &&
+                              value.status !== "Finish" ? (
+                                <p className="overdue">Overdue</p>
+                              ) : null}
+                              <p>
+                                Status:{" "}
+                                {value.status === "Finish" ? (
+                                  <HourglassTwoTone spin />
+                                ) : value.status === "Not done" ? (
+                                  <ExclamationCircleTwoTone
+                                    twoToneColor={"#dc143c"}
+                                  />
+                                ) : (
+                                  <CheckCircleTwoTone
+                                    twoToneColor={"#52c41a"}
+                                  />
+                                )}{" "}
+                                {value.status}
+                              </p>
+                            </div>
+                          </Card>
+                        </>
+                      );
+                    })}
                 </div>
-              </Card>
+              </>
             );
-          })}
-        </div>
+          }
+          return null;
+        })}
         <div className="parent-info">
           <Modal
             title={task}
@@ -211,6 +262,7 @@ function App() {
             footer={false}
           >
             <Form
+              layout="vertical"
               onFinish={handleSubmit}
               form={form2}
               className="info-detail"
@@ -221,14 +273,24 @@ function App() {
               {/* <Form.Item name="ten" label="Task name">
                 <Input value={task} />
               </Form.Item> */}
-              <Form.Item name="piority" label="Piority">
+              <Form.Item
+                name="piority"
+                label="Piority"
+                rules={[
+                  { required: true, message: "Please input piority task" },
+                ]}
+              >
                 <Select>
                   <Select.Option value="Normal">Normal</Select.Option>
                   <Select.Option value="Important">Important</Select.Option>
                   <Select.Option value="Urgent">Urgent</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item name="time" label="Time">
+              <Form.Item
+                name="time"
+                label="Time"
+                rules={[{ required: true, message: "Please input time task" }]}
+              >
                 <RangePicker />
               </Form.Item>
               <Form.Item name="number" label="Number of participants">
@@ -255,7 +317,13 @@ function App() {
                   </div>
                 </Upload>
               </Form.Item>
-              <Form.Item name="status" label="Status">
+              <Form.Item
+                name="status"
+                label="Status"
+                rules={[
+                  { required: true, message: "Please input status task" },
+                ]}
+              >
                 <Radio.Group>
                   <Radio value="Not done">
                     <Tag color="red">Not done</Tag>
