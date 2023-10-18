@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 import "./App.css";
 import React, { useEffect, useState } from "react";
 import {
@@ -57,8 +58,6 @@ function App() {
 
   const [listState, setListState] = useState(getLocalItems());
 
-  const [id, setId] = useState(0);
-
   const [selectTask, setSelectTask] = useState(null);
 
   useEffect(() => {
@@ -74,12 +73,25 @@ function App() {
         time: values.time,
         status: values.status,
       };
-      const newListState = [...listState];
-      newListState[id] = updateState;
-      setListState(newListState);
+      const updatedListState = listState.map((item) => {
+        if (item.id === selectTask.id) {
+          // kiểm tra id trùng với id muốn update
+          return updateState; // Trả về item cập nhật
+        }
+        return item; // Trả về item không cần cập nhật
+      });
+
+      setListState(updatedListState);
     } else {
+      let newId;
+      let isUniqueId = false;
+
+      while (!isUniqueId) {
+        newId = Math.random().toString(36).substring(2);
+        isUniqueId = !listState.some((item) => item.id === newId);
+      }
       const newState = {
-        id: listState.length,
+        id: newId,
         name: task,
         piority: values.piority,
         number: values.number,
@@ -94,6 +106,7 @@ function App() {
   const showModal = (value) => {
     setIsModalOpen(true);
     setTask(value.taskName);
+    setSelectTask(null);
     form1.resetFields();
   };
   // const handleOk = () => {
@@ -109,8 +122,7 @@ function App() {
     // indexToRemove => id
     setListState((prevItems) => {
       // prevItem : mảng ban đầu
-      const newItems = [...prevItems]; // ...prevItems: lấy và nối các ptu ban đầu
-      newItems.splice(indexToRemove, 1); // hàm splice để xóa ptu bắt đầu từ index( id)
+      const newItems = prevItems.filter((item) => item?.id !== indexToRemove);
       return newItems;
     });
   };
@@ -119,7 +131,6 @@ function App() {
     message.success("Delete successfully");
   };
   const cancel = (id) => {
-    console.log(id);
     message.error("No delete successfully");
   };
   const [form1] = Form.useForm();
@@ -160,17 +171,18 @@ function App() {
             </Form.Item>
           </Form>
         </div>
-        {Months.sort((a, b) => dayjs(a, "MM") - dayjs(b, "MM")).map((month) => { // sắp xếp tháng
-          return (
-            <>
-              <h1>Tháng {month}</h1>
-              <div className="card">
-                {listState
-                  .filter((value) => value.time[0].format("MM") === month)
-                  .sort((a, b) => a.time[0] - b.time[0]) //sắp xếp các item theo tháng bắt đầu từ bé đến lớn
-                  .map((value, index) => {
-                    return (
-                      <>
+        {Months.sort((a, b) => dayjs(a, "MM") - dayjs(b, "MM")).map(
+          (month, index) => {
+            // sắp xếp tháng
+            return (
+              <div key={index}>
+                <h1>Tháng {month}</h1>
+                <div className="card">
+                  {listState
+                    .filter((value) => value.time[0].format("MM") === month)
+                    .sort((a, b) => a.time[0] - b.time[0]) //sắp xếp các item theo tháng bắt đầu từ bé đến lớn
+                    .map((value, index) => {
+                      return (
                         <Card
                           className={
                             new Date() > value.time[1] &&
@@ -189,7 +201,6 @@ function App() {
                               className="edit"
                               onClick={() => {
                                 handleEdit(value);
-                                setId(index);
                               }}
                             >
                               <EditOutlined key="edit" />
@@ -198,8 +209,8 @@ function App() {
                               <Popconfirm
                                 title="Delete the task"
                                 description="Are you sure to delete this task?"
-                                onConfirm={() => confirm(index)}
-                                onCancel={cancel}
+                                onConfirm={() => confirm(value.id)}
+                                onCancel={() => cancel(value.id)}
                                 okText="Yes"
                                 cancelText="No"
                               >
@@ -237,13 +248,13 @@ function App() {
                             </p>
                           </div>
                         </Card>
-                      </>
-                    );
-                  })}
+                      );
+                    })}
+                </div>
               </div>
-            </>
-          );
-        })}
+            );
+          }
+        )}
         <div className="parent-info">
           <Modal
             title={task}
