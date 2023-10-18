@@ -17,12 +17,14 @@ import {
   message,
 } from "antd";
 import {
+  CalendarOutlined,
   CheckCircleTwoTone,
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleTwoTone,
   HourglassTwoTone,
   PlusOutlined,
+  ScheduleOutlined,
 } from "@ant-design/icons";
 
 import dayjs from "dayjs";
@@ -176,7 +178,11 @@ function App() {
             // sắp xếp tháng
             return (
               <div key={index}>
-                <h1>Tháng {month}</h1>
+                <h1 className="custom-month">
+                  <CalendarOutlined className="custom-month-icon" />
+                  Tháng {month}
+                </h1>
+
                 <div className="card">
                   {listState
                     .filter((value) => value.time[0].format("MM") === month)
@@ -194,7 +200,7 @@ function App() {
                           title={value.name}
                           bordered={false}
                           style={{
-                            width: 300,
+                            width: 260,
                           }}
                           actions={[
                             <div

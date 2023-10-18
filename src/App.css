@@ -60,10 +60,10 @@
 .overdue {
   position: absolute;
   rotate: -49deg;
-  color: orange;
+  color: red;
   top: -1px;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: bold;
   left: -6px;
 }
 .button-add {
@@ -72,4 +72,13 @@
 }
 .button-add:hover {
   background-color: orange !important;
+}
+.custom-month{
+  color: #ffa375;
+  margin-left: 25px;  
+  font-family: "Lilita One", cursive;
+}
+.custom-month-icon {
+  color: #c7ff40; 
+  margin-right: 20px; 
 }
