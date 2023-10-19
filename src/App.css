@@ -4,7 +4,6 @@
   background: linear-gradient(to bottom, #6600ff 0%, #ff66cc 100%);
   background-size: cover;
   min-height: 100vh;
-
 }
 .text-main {
   text-align: center;
@@ -81,4 +80,10 @@
 .custom-month-icon {
   color: #c7ff40; 
   margin-right: 20px; 
+}
+.button-chart {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  margin: 50px;
 }

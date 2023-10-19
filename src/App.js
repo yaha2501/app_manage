@@ -27,9 +27,28 @@ import {
   ScheduleOutlined,
 } from "@ant-design/icons";
 
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
 import dayjs from "dayjs";
+import { Doughnut } from "react-chartjs-2";
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 const normFile = (e) => {
   if (Array.isArray(e)) {
     return e;
@@ -61,6 +80,8 @@ function App() {
   const [listState, setListState] = useState(getLocalItems());
 
   const [selectTask, setSelectTask] = useState(null);
+
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("lists", JSON.stringify(listState)); // add data to localStorage
@@ -105,7 +126,7 @@ function App() {
     form2.resetFields();
     setIsModalOpen(false);
   };
-  const showModal = (value) => {
+  const onFinish = (value) => {
     setIsModalOpen(true);
     setTask(value.taskName);
     setSelectTask(null);
@@ -152,12 +173,43 @@ function App() {
   const Months = [
     ...new Set(listState.map((val) => val.time[0].format("MM"))), //lưu các tháng có trong mảng item
   ];
+  const workCountByMonth = new Array(12).fill(0);
+
+  listState.forEach((item) => {
+    const [from] = item.time.map((date) => new Date(date));
+    const startMonth = from.getMonth();
+    workCountByMonth[startMonth]++;
+  });
+  const labels = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: "Lượng công việc",
+        data: workCountByMonth,
+        backgroundColor: "rgba(255, 99, 132, 0.5)",
+      },
+    ],
+  };
   return (
     <div className="parent">
       <div className="background">
         <h1 className="text-main">Work management</h1>
         <div className="parent-search">
-          <Form onFinish={showModal} form={form1} className="form">
+          <Form onFinish={onFinish} form={form1} className="form">
             <Form.Item
               name="taskName"
               rules={[
@@ -353,6 +405,21 @@ function App() {
           </Modal>
         </div>
       </div>
+      <div className="button-chart">
+        <Button type="primary" onClick={() => setShowModal(true)}>
+          Thống kê
+        </Button>
+      </div>
+      <Modal
+        title="Biểu đồ công việc"
+        open={showModal}
+        footer={null}
+        closable={false}
+        onOk={() => setShowModal(false)}
+        onCancel={() => setShowModal(false)}
+      >
+        <Bar data={data} />
+      </Modal>
     </div>
   );
 }
