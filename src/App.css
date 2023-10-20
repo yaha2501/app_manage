@@ -87,3 +87,9 @@
   bottom: 0;
   margin: 50px;
 }
+.custom-button-chart{
+   background-color: #f27474;
+}
+.custom-button-chart:hover {
+  background-color: orange !important; 
+}

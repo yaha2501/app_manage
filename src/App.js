@@ -200,7 +200,7 @@ function App() {
       {
         label: "Lượng công việc",
         data: workCountByMonth,
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
+        backgroundColor: "orange" 
       },
     ],
   };
@@ -406,7 +406,7 @@ function App() {
         </div>
       </div>
       <div className="button-chart">
-        <Button type="primary" onClick={() => setShowModal(true)}>
+        <Button type="primary" onClick={() => setShowModal(true)} className="custom-button-chart">
           Thống kê
         </Button>
       </div>
