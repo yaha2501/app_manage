@@ -23,8 +23,7 @@ import {
   EditOutlined,
   ExclamationCircleTwoTone,
   HourglassTwoTone,
-  PlusOutlined,
-  ScheduleOutlined,
+  PlusOutlined 
 } from "@ant-design/icons";
 
 import {
@@ -38,7 +37,6 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import dayjs from "dayjs";
-import { Doughnut } from "react-chartjs-2";
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 ChartJS.register(
@@ -141,10 +139,8 @@ function App() {
     setSelectTask(null);
     form2.resetFields();
   };
-  const removeTask = (indexToRemove) => {
-    // indexToRemove => id
-    setListState((prevItems) => {
-      // prevItem : mảng ban đầu
+  const removeTask = (indexToRemove) => {// indexToRemove => id
+    setListState((prevItems) => {// prevItem : mảng ban đầu
       const newItems = prevItems.filter((item) => item?.id !== indexToRemove);
       return newItems;
     });
